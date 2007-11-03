@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<benchmark>
+
+    <tasks copyright="Copyright 2005 Apache Software Foundation.">
+
+        <source classname="org.apache.commons.benchmark.rrd.ExampleRandomSource"
+                name="random"
+                title="Random RRD Source"
+                unitDescription="random"
+                unitName="int">
+
+            <param name="foo"
+                   value="bar" />
+
+            <!--
+            <param name="" value=""/>    
+
+            <param name="q">
+                   
+                SELECT AVG(*) FROM FEED WHERE LAST_UPDATED > n;
+
+            </param>
+                 
+             -->
+
+        </source>
+
+        <!--
+        <source classname="org.apache.commons.benchmark.rrd.XmlrpcSource">
+            
+            <param name="host"        value="robot4.rojo.com" />
+            <param name="port"        value="2048" />
+            <param name="benchmark"   value="ksa.robot.FeedTask" />
+
+        </source>
+
+         -->
+
+    </tasks>
+
+</benchmark>

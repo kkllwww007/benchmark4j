@@ -1,0 +1,112 @@
+
+- 
+
+    <category name="org" 
+              enabled="true" 
+              logOnRollover="true"
+              broadcastOnRollver="true" >
+
+- New config file entries:
+
+    <Broadcaster>
+        broadcast( Benchmark b );
+        
+    <GangliaBroadcaster>
+        broadcast( Benchmark b );
+
+    <BroadcastManager>
+        +addBroadcaster( Broadcaster ): void
+        +getBroadcasters(): Iterator
+
+        .setChannel( String value )
+
+    <broadcaster classname="org.apache.commons.benchmark.broadcast.GangliaBroadcaster">
+        <param name="channel" value="239.2.11.75" />
+
+        <param name="configFile" value="/etc/gmon.conf" />
+
+    </broadcaster>
+
+- If I'm going to include metadata including duration, meanDuration, completed,
+  etc how could I encode these into the benchmark name that I log via ganglia
+
+    - org.apache.peerfear.Foo#bar,meanDuration,1min
+    - org.apache.peerfear.Foo#bar,completed,1min
+
+- If we're going to be using real constructors like new Benchmark() it begs the
+  question whether we shouldn't just refactor the WHOLE system to use this
+
+    Benchmark( Clazz )
+    Benchmark( target, operation )
+    Benchmark( String )
+
+    The problem with this method is that its not singleton based its only
+    constuctor based.   
+
+- Every once and a while the daemon FREAKS out and won't log to RRDs.  Why's
+  that?
+
+- The daemon won't respond to kill.  For the record NEITHER does the old rbtgraph.
+
+- Ability to introspect duration to find high mean duration benchmarks or high
+  transaction benchmarks.  (Maybe this needs to happen at introsection time).
+
+- TODO: What about custom logged values.  For example the AGE of something when
+  we updated it.  
+
+    start()
+    complete( meta )
+
+- (DONE) Should we migrate to using 1, 5, 30 minute intervals like LOAD does?  How
+  would we do this?
+
+    - We're doing it now.  I need to bench this.
+
+- (DONE) Need to review:
+
+   http://opensource.atlassian.com/profiling/
+
+    The benchmark code is farther along.  Not sure if the code is maintained.
+    It doesn't do 1/5/15 min intervals.  Not sure if we have the same goals. I
+    can't make sense of the code here.
+
+- (DONE) Take my jrobin code and port it into commons benchmark when I refactor
+  it?  That seems to make a TON of sense I think.
+    
+    - Then I can have a config file with all the metainfo and the name of the
+      benchmark to log with an XMLRPC daemon to fetch the data and jrobin to log
+      it.
+
+- (DONE) Should we compute the median?  I don't think we can without the entire
+  data set.
+
+- Ability to enable logging with log4j and debug() so that during every rotate
+  of the benchmarks I will get a log.info() message.  These should be log4j
+  categories so that I can do benchmark.ksa.om.ArticlePeer.hasArticle and then
+  enable benchmarks via a log4j configurator.
+
+  - Potential bug.  When we don't call start/complete for a long period of time
+    (greater than the interval) we wouldn't ever log our status correctly.
+
+- It might actually be BETTER to combine the last benchmark with the current
+  benchmark but prorate the current value and then avg() them.  (NOTE: isn't
+  this instantaneous velocity?). This would give us a more realistic "ETA" style
+  benchmark of current performance.  For stats which don't update very much or
+  for 5 minute interval stats this would be perfect.
+
+- We're going to need a config file similar to log4j... Would be better to use a
+runtime properties mechanism.
+
+- port over my RRD stuff from ksa.rbtgraph:
+
+    - goals
+
+        - support more concurrent datasources
+
+        - full XML configuration file for datasources
+
+        - Support for different consolidation functions rather than just
+          AVG. I'll need to incorporate this for the <source> element.
+
+        - 
+
