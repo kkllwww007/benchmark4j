@@ -244,6 +244,13 @@ public class BenchmarkTracker {
         return now;
     }
 
+    public String toString() {
+
+        return "now=("  + now.toString() + ") last=(" + last.toString() + ") "
+            ;
+
+    }
+
 }
 
 /**

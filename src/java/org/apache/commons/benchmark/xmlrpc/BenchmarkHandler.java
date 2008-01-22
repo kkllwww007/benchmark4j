@@ -30,34 +30,6 @@ import org.apache.commons.benchmark.*;
  */
 public class BenchmarkHandler {
 
-    //FIXME: I think this needs to be refactored due to the getTracker1() code.
-    //I should be able to specify time here.
-    
-    public Double getLastStarted( String name ) {
-
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getStarted() );
-    }
-
-    public Double getLastCompleted( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getCompleted() );
-    }
-
-    public Double getLastDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getDuration() );
-    }
-
-    public Double getLastMeanDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getMeanDuration() );
-    }
-
-    public Map getBenchmark( String name ) {
-        return getBenchmarkAsHashtable( name );
-    }
-    
     /**
      * Get an individual benchmark as a hashtable with all values exposed.
      *
@@ -71,9 +43,6 @@ public class BenchmarkHandler {
             return null;
 
         Hashtable map = new Hashtable();
-
-        //map.put( "1min.now.duration", new Double( benchmark.getTracker1().getNow().duration ) );
-        //map.put( "1min.last.duration", new Double( benchmark.getTracker1().getNow().duration ) );
 
         addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(), "1min." );
         addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(), "5min." );
@@ -119,10 +88,10 @@ public class BenchmarkHandler {
         return result;
     }
     
-    private void addHashtableMetrics( Hashtable map, 
-                                      Benchmark benchmark, 
-                                      BenchmarkMeta meta, 
-                                      String prefix ) {
+    void addHashtableMetrics( Hashtable map, 
+                              Benchmark benchmark, 
+                              BenchmarkMeta meta, 
+                              String prefix ) {
 
         map.put( prefix + "duration", new Double( meta.getDuration() ) );
         map.put( prefix + "meanDuration", new Double( meta.getMeanDuration() ) );
@@ -139,6 +108,46 @@ public class BenchmarkHandler {
 
         }
 
+    }
+
+    /**
+     * @deprecated use getBenchmarkAsHashtable
+     */
+    public Map getBenchmark( String name ) {
+        return getBenchmarkAsHashtable( name );
+    }
+
+    /**
+     * @deprecated use getBenchmarkAsHashtable
+     */
+    public Double getLastStarted( String name ) {
+
+        return new Double( Benchmark.getBenchmark( name )
+                           .getTracker1().getLast().getStarted() );
+    }
+
+    /**
+     * @deprecated use getBenchmarkAsHashtable
+     */
+    public Double getLastCompleted( String name ) {
+        return new Double( Benchmark.getBenchmark( name )
+                           .getTracker1().getLast().getCompleted() );
+    }
+
+    /**
+     * @deprecated use getBenchmarkAsHashtable
+     */
+    public Double getLastDuration( String name ) {
+        return new Double( Benchmark.getBenchmark( name )
+                           .getTracker1().getLast().getDuration() );
+    }
+
+    /**
+     * @deprecated use getBenchmarkAsHashtable
+     */
+    public Double getLastMeanDuration( String name ) {
+        return new Double( Benchmark.getBenchmark( name )
+                           .getTracker1().getLast().getMeanDuration() );
     }
 
 }

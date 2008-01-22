@@ -241,19 +241,28 @@ public class Benchmark {
     // **** implementation code for start/complete **********************************
 
     /**
-     * @deprecated use CallerBenchmark
+     * Needs to be called BEFORE we run any metrics are executed (like start,
+     * complete, hit, miss, etc).  Return true if we should continue.  This is
+     * the key entry point for any metric interface.
      */
-    public void start( String name ) {
-        Benchmark child = child( name );
-        child.start();
-    }
+    boolean beforeMetric() {
 
-    /**
-     * @deprecated use CallerBenchmark
-     */
-    public void complete( String name ) {
-        Benchmark child = child( name );
-        child.complete();
+        if ( DISABLED )
+            return false;
+
+        if ( requiresFullInit ) {
+            initCaller( true );
+            clear();
+        }
+
+        doRegisterWhenNecessary();
+
+        //this could happen if start() isn't called first.
+        if ( tracker1 == null )
+            return false;
+
+        return true;
+        
     }
 
     /**
@@ -289,7 +298,7 @@ public class Benchmark {
      */
     public void complete() {
 
-        if ( DISABLED  )
+        if ( DISABLED )
             return;
 
         doRegisterWhenNecessary();
@@ -306,7 +315,7 @@ public class Benchmark {
 
     public void cache_hit() {
 
-        if ( DISABLED  )
+        if ( DISABLED )
             return;
 
         if ( requiresFullInit ) {
@@ -358,7 +367,27 @@ public class Benchmark {
         
     }
 
-    private void doRegisterWhenNecessary() {
+    /**
+     * @deprecated use CallerBenchmark
+     */
+    public void start( String name ) {
+        Benchmark child = child( name );
+        child.start();
+    }
+
+    /**
+     * @deprecated use CallerBenchmark
+     */
+    public void complete( String name ) {
+        Benchmark child = child( name );
+        child.complete();
+    }
+    
+    /**
+     * Register this with the system for just in time bencmarks.
+     *
+     */
+    void doRegisterWhenNecessary() {
 
         if ( registered == false && name != null ) {
             benchmarks.put( name, this );
@@ -531,47 +560,14 @@ public class Benchmark {
     // **** Object methods ******************************************************
 
     public String toString() {
-        return "1min: {" + toString( getTracker1() ) + "}" + " " +
-               "5min: {" + toString( getTracker5() ) + "}" + " " +
-               "15min: {" + toString( getTracker15() ) + "}" +
+        return "1min: {" + getTracker1().toString() + "}" + " " +
+               "5min: {" + getTracker1().toString() + "}" + " " +
+               "15min: {" + getTracker1().toString() + "}" +
                ", line number: " + 
                lineNumber 
         ;
 
     }
 
-    public String toString( BenchmarkTracker tracker ) {
-
-        return 
-            "now=("  +
-            "started:" +
-            tracker.now.getStarted() +
-            "," +
-            "completed:" +
-            tracker.now.getCompleted() +
-            "," +
-            "duration:" +
-            tracker.now.getDuration() +
-            "," +
-            "meanDuration:" +
-            tracker.now.getMeanDuration() +
-            ")" + 
-            " " +
-            "last=("  +
-            "started:" +
-            tracker.last.getStarted() +
-            "," +
-            "completed:" +
-            tracker.last.getCompleted() +
-            "," +
-            "duration:" +
-            tracker.last.getDuration() +
-            "," +
-            "meanDuration:" +
-            tracker.last.getMeanDuration() +
-            ") "
-            ;
-
-    }
-    
 }
+

@@ -25,8 +25,8 @@
 
         <javac classpathref="project.classpath"
                nowarn="on"
-               source="1.4"
-               target="1.4"
+               source="1.5"
+               target="1.5"
                srcdir="src/java"
                destdir="target/classes"
                debug="true">

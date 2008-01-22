@@ -16,6 +16,9 @@
 
 package org.apache.commons.benchmark;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Used to represent metadata for a benchmark including name, timestamp,
  * started, completed, etc.
@@ -110,6 +113,40 @@ public class BenchmarkMeta {
         cache_misses = 0;
         cache_hits = 0;
         cache_sets = 0;
+    }
+
+    public String toString() {
+
+        return 
+            "started:" +
+            getStarted() +
+            "," +
+            "completed:" +
+            getCompleted() +
+            "," +
+            "duration:" +
+            getDuration() +
+            "," +
+            "meanDuration:" +
+            getMeanDuration() 
+            ;
+
+    }
+
+    /**
+     * Provide the benchmark metadata as a map for use with external systems.
+     */
+    public Map toMap() {
+
+        Map<String,Long> map = new HashMap();
+
+        map.put( "duration",      getDuration() );
+        map.put( "meanDuration",  getMeanDuration() );
+        map.put( "completed",     getCompleted() );
+        map.put( "started",       getStarted() );
+
+        return map;
+        
     }
     
 }
