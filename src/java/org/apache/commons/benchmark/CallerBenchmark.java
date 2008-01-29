@@ -63,11 +63,24 @@ public class CallerBenchmark extends Benchmark {
      */
     public static boolean ENABLE_PARENT_DETECTION = true;
 
+    /**
+     * When non-null also register events to this target as well.  This is
+     * usually done with child( true ) to log to the parent caller as well.
+     */
+    CallerBenchmark sink = null;
+
+    /**
+     * Used for parent class detection.
+     */
+    private Object parent = null;
+    
     public CallerBenchmark( Object parent ) {
 
         super( true );
 
-        if ( ENABLE_PARENT_DETECTION ) {
+        this.parent = parent;
+        
+        if ( ENABLE_PARENT_DETECTION && parent != null ) {
             classname = parent.getClass().getName();
         }
 
@@ -82,9 +95,72 @@ public class CallerBenchmark extends Benchmark {
 
     }
 
+    CallerBenchmark( String name ) {
+        super( name );
+    }
+    
+    /**
+     * Get the caller for this mark.
+     */
     public CallerInfo getCallerInfo() {
         return new CallerInfo( lineNumber, method, classname );
     }
-    
+
+    public CallerBenchmark child( String name ) {
+        return child( name, false );
+    }
+
+    /**
+     * Create a new child benchmark based on this given benchmark name as a
+     * prefix and the target name as a suffix.  If
+     * <code>sendCallsToParent</code> is true we will also call methods on the
+     * parent benchmark when necessary.
+     */
+    public CallerBenchmark child( String name,
+                                  boolean sendCallsToParent ) {
+
+        beforeMetric();
+
+        //we have to synchronize on this hashmap I'm afraid.  I could use a
+        //ConcurrentHashMap but I'm not sure of the performance advantage here.
+        synchronized( benchmarks ) {
+
+            String key = super.getName() + "." + name;
+            
+            CallerBenchmark child = (CallerBenchmark)benchmarks.get( key );
+
+            if ( child == null ) {
+                child = new CallerBenchmark( key );
+                child.sink = this;
+                registerBenchmark( key, child );
+            }
+
+            return child;
+
+        }
+        
+    }
+
+    /**
+     * @see Benchmark.start
+     */
+    public void start() {
+
+        if ( sink != null ) sink.start(); 
+
+        super.start();
+
+    }
+
+    /**
+     * @see Benchmark.complete
+     */
+    public void complete() {
+
+        if ( sink != null ) sink.complete(); 
+
+        super.complete();
+
+    }
+
 }
-    

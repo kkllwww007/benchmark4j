@@ -42,12 +42,33 @@ public class BenchmarkHandler {
         if ( benchmark == null )
             return null;
 
-        Hashtable map = new Hashtable();
+        Map map = new Hashtable();
 
         addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(), "1min." );
         addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(), "5min." );
         addHashtableMetrics( map, benchmark, benchmark.getTracker15().getLast(), "15min." );
         
+        return map;
+        
+    }
+
+    public Map getBenchmarkAsHashtable2( String name ) {
+
+        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+
+        if ( benchmark == null )
+            return null;
+
+        Map map = new Hashtable();
+
+        addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(),   "last.1min."  );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(),   "last.5min."  );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker15().getLast(),  "last.15min." );
+
+        addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(),   "now.1min."   );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(),   "now.5min."   );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker15().getLast(),  "now.15min."  );
+
         return map;
         
     }
@@ -88,7 +109,7 @@ public class BenchmarkHandler {
         return result;
     }
     
-    void addHashtableMetrics( Hashtable map, 
+    void addHashtableMetrics( Map map, 
                               Benchmark benchmark, 
                               BenchmarkMeta meta, 
                               String prefix ) {

@@ -250,9 +250,34 @@ public class Benchmark {
         if ( DISABLED )
             return false;
 
+        // NOTE: this duplicate if ( requiresFullInit ) statement is a bit
+        // unusual.  We have one outside the synchronized block and one inside
+        // the block.  Why are we doing this?
+        //
+        // The outer if statement allows us to avoid acquiring the synchronized
+        // lock once the instance has been instantiated.  This will be done for
+        // 99% of the lifetime of the object.
+        //
+        // During startup multiple threads will bypass this first if statement
+        // and attempt to acquire the lock.  ONE will succeed, init the object,
+        // and then set requiresFullInit = true.  The other threads will then
+        // acquire the lock one by one.  We then want to skip re-initialization
+        // because it's no longer required which is why we have the second if
+        // statement.
+        //
+        // I wonder if there's a more elegant way to do this such as a
+        // synchronizedIf statement.
+        //
+        // Avoid synchronization here is critical because we want to prevent
+        // peformance issues on multicore boxes.
+
         if ( requiresFullInit ) {
-            initCaller( true );
-            clear();
+            synchronized( FULL_INIT_MUTEX ) {
+                if ( requiresFullInit ) {
+                    initCaller( true );
+                    clear();
+                }
+            }
         }
 
         doRegisterWhenNecessary();
@@ -313,6 +338,30 @@ public class Benchmark {
         
     }
 
+    /**
+     * Used to compute stats on items that have absolute values and don't
+     * necessary have start/complete cycles.  This is internally mapped to
+     * start/complete for simplict.
+     */
+    public void increment() {
+
+        start();
+        complete();
+        
+    }
+
+    /**
+     * Used to compute stats on items that have absolute values and don't
+     * necessary have start/complete cycles.  This is internally mapped to
+     * start/complete for simplict.
+     */
+    public void increment( String name ) {
+
+        start( name );
+        complete( name );
+        
+    }
+
     public void cache_hit() {
 
         if ( DISABLED )
@@ -368,7 +417,7 @@ public class Benchmark {
     }
 
     /**
-     * @deprecated use CallerBenchmark
+     * @deprecated use child( "foo" ).start()
      */
     public void start( String name ) {
         Benchmark child = child( name );
@@ -537,9 +586,8 @@ public class Benchmark {
             Benchmark benchmark = (Benchmark)benchmarks.get( name );
 
             if ( benchmark == null ) {
-                benchmark= new Benchmark( name );
-                benchmarks.put( name, benchmark );
-                benchmark.registered = true;
+                benchmark = new Benchmark( name );
+                registerBenchmark( name, benchmark );
             }
 
             return benchmark;
@@ -548,6 +596,18 @@ public class Benchmark {
 
     }	
 
+    /**
+     * Register a benchmark with the system. 
+     */
+    static void registerBenchmark( String name, Benchmark b ) {
+
+        synchronized( benchmarks ) {
+            benchmarks.put( name, b );
+            b.registered = true;
+        }
+
+    }
+    
     /**
      * Return a map of all known benchmarks.
      *
