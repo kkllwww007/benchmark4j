@@ -30,17 +30,19 @@ import org.apache.commons.benchmark.*;
  */
 public class BenchmarkHandler {
 
+    public static final Map EMPTY_MAP = new Hashtable();
+    
     /**
      * Get an individual benchmark as a hashtable with all values exposed.
      *
-     * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
+     * @author <a href="mailto:burton@tailrank.com">KeviNn A. Burton</a>
      */
     public Map getBenchmarkAsHashtable( String name ) {
 
         Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null )
-            return null;
+            return EMPTY_MAP;
 
         Map map = new Hashtable();
 
@@ -57,7 +59,7 @@ public class BenchmarkHandler {
         Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null )
-            return null;
+            return Collections.EMPTY_MAP;
 
         Map map = new Hashtable();
 
@@ -81,32 +83,8 @@ public class BenchmarkHandler {
      * 
      * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
      */
-    public Map getBenchmarks() throws Throwable {
-
-        String key = null;
-        Hashtable result = new Hashtable();
-
-        try {
-
-            Iterator it = Benchmark.getBenchmarks().keySet().iterator();
-            
-            while ( it.hasNext() ) {
-                
-                key = (String)it.next();
-                
-                Benchmark b = Benchmark.getBenchmark( key );
-                
-                result.put( b.getName(), b.toString() );
-                
-            } 
-
-        } catch ( Throwable t ) {
-            System.out.println( "Caught exception on key: " + key );
-            t.printStackTrace();
-            throw t;
-        }
-        
-        return result;
+    public Map getBenchmarks() throws Exception {
+        return Benchmark.getBenchmarksAsExternalMap();
     }
     
     void addHashtableMetrics( Map map, 

@@ -580,7 +580,9 @@ public class Benchmark {
     public static Benchmark getBenchmark( String name ) {
 
         //we have to synchronize on this hashmap I'm afraid.  I could use a
-        //ConcurrentHashMap but I'm not sure of the performance advantage here.
+        //ConcurrentHashMap but I'm not sure of the performance advantage this
+        //would bring.  Ideally we could have this entire library be
+        //unsynchronized.
         synchronized( benchmarks ) {
 
             Benchmark benchmark = (Benchmark)benchmarks.get( name );
@@ -597,6 +599,48 @@ public class Benchmark {
     }	
 
     /**
+     * Get all benchmarks as a map to be used by an external syste.  toString()
+     * is called on all the benchmarks.  This can be much higher performance as
+     * only one lock is acquired.
+     *
+     */
+    public static Map<String,String> getBenchmarksAsExternalMap() throws Exception {
+
+        //NOTE: we must use hashtable here so that we're compatible with XMLRPC.
+        Map<String,String> result = new Hashtable();
+
+        String key = null;
+        
+        try {
+
+            synchronized( benchmarks ) {
+
+                Iterator it = benchmarks.keySet().iterator();
+
+                while ( it.hasNext() ) {
+
+                    key = (String)it.next();
+
+                    Benchmark b = (Benchmark)benchmarks.get( key );
+
+                    if ( b == null )
+                        continue;
+                    
+                    result.put( b.getName(), b.toString() );
+                    
+                } 
+
+            }
+
+        } catch ( Exception t ) {
+            throw new Exception( "Caught exception on key: " + key , t );
+        }
+
+        return result;
+        
+    }
+
+    /**
      * Register a benchmark with the system. 
      */
     static void registerBenchmark( String name, Benchmark b ) {
@@ -606,6 +650,56 @@ public class Benchmark {
             b.registered = true;
         }
 
+    }
+
+    /**
+     * Read a benchmark as a map for use in external applications. Note that
+     * BenchmarkHandler should migrate ot using this mechanims. 
+     *
+     */
+    public static Map<String,Double> readBenchmark( String name ) {
+
+        //use a hashtable to be compatible with our legacy XMLRPC
+        //implementation.
+        Hashtable result = new Hashtable();
+        
+        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+
+        if ( benchmark == null ) {
+            return result;
+        }
+
+        readBenchmark( result, benchmark.getTracker1().getLast(),  "1min." );
+        readBenchmark( result, benchmark.getTracker5().getLast(),  "5min." );
+        readBenchmark( result, benchmark.getTracker15().getLast(), "15min." );
+
+        //TODO: add a 'full' param so that I can include, 'last' and 'now' metrics.
+        
+        return result;
+        
+    }
+
+    private static Map<String,Double> readBenchmark( Map map, BenchmarkMeta meta, String prefix ) {
+
+        map.put( prefix + "duration",     new Double( meta.getDuration() ) );
+        map.put( prefix + "meanDuration", new Double( meta.getMeanDuration() ) );
+        map.put( prefix + "completed",    new Double( meta.getCompleted() ) );
+        map.put( prefix + "started",      new Double( meta.getStarted() ) );
+
+        //cache benchmarks have additional metadata.
+        /*
+        if ( benchmark instanceof CacheBenchmark ) {
+
+            map.put( prefix + "cache_hits", new Integer( meta.getCacheHits() ) );
+            map.put( prefix + "cache_misses", new Integer( meta.getCacheMisses() ) );
+            map.put( prefix + "cache_sets", new Integer( meta.getCacheSets() ) );
+            map.put( prefix + "cache_efficiency", new Double( meta.getCacheEfficiency() ) );
+
+        }
+        */
+
+        return map;
+        
     }
     
     /**
