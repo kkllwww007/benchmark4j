@@ -28,7 +28,7 @@ import java.util.*;
  * @author <a href="mailto:burton@tailrank.com">Kevin Burton</a>
  * @version $Id: Benchmark.java,v 1.3 2005/02/16 02:28:09 burton Exp $
  */
-public class BenchmarkTracker {
+public class BenchmarkTracker2 {
 
     /**
      * Mutext used to prevent threads from corrupting start/complete cycles.
@@ -52,8 +52,8 @@ public class BenchmarkTracker {
      */
     private static BenchmarkThreadLocal threadlocal = new BenchmarkThreadLocal();
 
-    BenchmarkMeta now = new BenchmarkMeta();
-    BenchmarkMeta last = new BenchmarkMeta();
+    BenchmarkMeta2 now = new BenchmarkMeta2();
+    BenchmarkMeta2 last = new BenchmarkMeta2();
 
     /**
      * The interval that this value is rolled over with (1, 5, 15 minutes)
@@ -64,14 +64,14 @@ public class BenchmarkTracker {
     
     /**
      * 
-     * Create a new <code>BenchmarkTracker</code> instance.
+     * Create a new <code>BenchmarkTracker2</code> instance.
      */
-    public BenchmarkTracker( int interval, Benchmark parent ) {
+    public BenchmarkTracker2( int interval, Benchmark parent ) {
         this.interval = interval;
         this.parent = parent;
     }
 
-    BenchmarkTracker rollover() {
+    BenchmarkTracker2 rollover() {
         rollover( System.currentTimeMillis() );
         return this;
     }
@@ -81,7 +81,7 @@ public class BenchmarkTracker {
      *
      * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
      */
-    BenchmarkTracker rollover( long currentTimeMillis ) {
+    BenchmarkTracker2 rollover( long currentTimeMillis ) {
 
         //need to perform a swap and save the current benchmark.
         last = now;
@@ -92,19 +92,20 @@ public class BenchmarkTracker {
         //having to block.1
         
         //if we've slept for too long we have to start fresh
-        if ( currentTimeMillis - last.timestamp > (interval * 2) ) {
+        if ( currentTimeMillis - last.timestamp.get() > (interval * 2) ) {
             last.reset();
         } 
 
         if ( last.getTimestamp() > 0 ) {
-            BenchmarkListenerRegistry.applyRollover( parent, this, last );
+            //FIXME
+            //BenchmarkListenerRegistry.applyRollover( parent, this, last );
         }
         
         //reset the benchmark (note.  We could probably save a bit of GC here by
         //swapping the last and now values since the last would just be
         //discarded anyway.
-        now = new BenchmarkMeta();
-        now.timestamp = currentTimeMillis;
+        now = new BenchmarkMeta2();
+        now.timestamp.set( currentTimeMillis );
 
         //this isn't needed since it's a new benchmark.
         //now.reset();
@@ -113,25 +114,39 @@ public class BenchmarkTracker {
 
     }
 
-    BenchmarkTracker rolloverWhenNecessary() {
+    BenchmarkTracker2 rolloverWhenNecessary() {
         return rolloverWhenNecessary( System.currentTimeMillis() );
     }
     
     /**
      * Rollover stats if necessary.
      */
-    BenchmarkTracker rolloverWhenNecessary( long currentTimeMillis ) {
+    BenchmarkTracker2 rolloverWhenNecessary( long currentTimeMillis ) {
 
-        if ( currentTimeMillis - now.timestamp > interval )
-            rollover( currentTimeMillis );
+        if ( isExpired( currentTimeMillis ) ) {
+
+            synchronized( MUTEX ) {
+
+                //double check idiom
+                if ( isExpired( currentTimeMillis ) ) {
+                    rollover( currentTimeMillis );
+                }
+
+            }
+            
+        }
 
         return this;
         
     }
 
+    boolean isExpired( long currentTimeMillis ) {
+        return currentTimeMillis - now.timestamp.get() > interval;
+    }
+
     void start() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
@@ -140,10 +155,8 @@ public class BenchmarkTracker {
         //didn't then another thread could come in, and corrupt our metadata
         //about this benchmark.  Since benchmarks are often performed within
         //threads this is important.
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.started;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.started.getAndIncrement();
 
         doLocalStart( currentTimeMillis );
 
@@ -151,15 +164,13 @@ public class BenchmarkTracker {
 
     void complete() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.completed;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.completed.getAndIncrement();
         
         doLocalCompleted( currentTimeMillis );
 
@@ -167,44 +178,37 @@ public class BenchmarkTracker {
 
     void cache_hit() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.cache_hits;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.cache_hits.getAndIncrement();
 
     }
 
     void cache_miss() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.cache_misses;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.cache_misses.getAndIncrement();
 
     }
 
     void cache_set() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-        }
-
-        ++now.cache_sets;
+        rolloverWhenNecessary( currentTimeMillis );
+        now.cache_sets.getAndIncrement();
 
     }
 
@@ -228,7 +232,7 @@ public class BenchmarkTracker {
         
         closure.completedTimeMillis = System.currentTimeMillis();
 
-        now.duration += closure.completedTimeMillis - closure.startedTimeMillis;
+        now.duration.getAndAdd( closure.completedTimeMillis - closure.startedTimeMillis );
         
     }
 
@@ -241,11 +245,11 @@ public class BenchmarkTracker {
     
     // **** metadata ************************************************************
 
-    public BenchmarkMeta getLast() {
+    public BenchmarkMeta2 getLast() {
         return last;
     }
 
-    public BenchmarkMeta getNow() {
+    public BenchmarkMeta2 getNow() {
         return now;
     }
 

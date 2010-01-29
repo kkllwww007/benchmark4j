@@ -687,13 +687,14 @@ public class Benchmark {
         map.put( prefix + "started",      new Double( meta.getStarted() ) );
 
         //cache benchmarks have additional metadata.
+        
         /*
         if ( benchmark instanceof CacheBenchmark ) {
 
-            map.put( prefix + "cache_hits", new Integer( meta.getCacheHits() ) );
-            map.put( prefix + "cache_misses", new Integer( meta.getCacheMisses() ) );
-            map.put( prefix + "cache_sets", new Integer( meta.getCacheSets() ) );
-            map.put( prefix + "cache_efficiency", new Double( meta.getCacheEfficiency() ) );
+            map.put( prefix + "hits", new Integer( meta.getCacheHits() ) );
+            map.put( prefix + "misses", new Integer( meta.getCacheMisses() ) );
+            map.put( prefix + "sets", new Integer( meta.getCacheSets() ) );
+            map.put( prefix + "efficiency", new Double( meta.getCacheEfficiency() ) );
 
         }
         */
@@ -715,10 +716,24 @@ public class Benchmark {
 
     public String toString() {
         return "1min: {" + getTracker1().toString() + "}" + " " +
-               "5min: {" + getTracker1().toString() + "}" + " " +
-               "15min: {" + getTracker1().toString() + "}" +
+               "5min: {" + getTracker5().toString() + "}" + " " +
+               "15min: {" + getTracker15().toString() + "}" +
                ", line number: " + 
                lineNumber 
+        ;
+
+    }
+
+    /**
+     * Get a quick/brief status of the number of completed items.
+     *
+     */
+    public String status() {
+        
+        return String.format( "1min: %,d, 5min: %,d, 15min: %,d" ,
+                              getTracker1().getLast().getCompleted() ,
+                              getTracker5().getLast().getCompleted() ,
+                              getTracker15().getLast().getCompleted() )
         ;
 
     }

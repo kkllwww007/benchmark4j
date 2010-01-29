@@ -45,16 +45,22 @@ public class BenchmarkListenerRegistry {
 
         if ( listeners.size() == 0 )
             return;
-        
-        Iterator it = listeners.iterator();
 
+        Iterator it = listeners.iterator();
+        
         while( it.hasNext() ) {
 
-            BenchmarkListener listener = (BenchmarkListener)it.next();
-            listener.onRollover( benchmark, tracker, meta );
+            try {
+                
+                BenchmarkListener listener = (BenchmarkListener)it.next();
+                listener.onRollover( benchmark, tracker, meta );
+                
+            } catch ( RuntimeException e ) {
+                // callers need to do this themselves ... 
+            }
             
         }
-        
+
     }
 
 }

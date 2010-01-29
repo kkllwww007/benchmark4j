@@ -121,11 +121,19 @@ public class CallerBenchmark extends Benchmark {
 
         beforeMetric();
 
-        //we have to synchronize on this hashmap I'm afraid.  I could use a
-        //ConcurrentHashMap but I'm not sure of the performance advantage here.
-        synchronized( benchmarks ) {
+        StringBuilder buff = new StringBuilder( 128 );
 
-            String key = super.getName() + "." + name;
+        buff.append( super.getName() )
+            .append( "." )
+            .append( name )
+            ;
+        
+        String key = buff.toString();
+
+        //we have to synchronize on this hashmap I'm afraid.  I could use a
+        //ConcurrentHashMap but I'm not sure of the performance advantage here
+        //and if it is worth switching. 
+        synchronized( benchmarks ) {
             
             CallerBenchmark child = (CallerBenchmark)benchmarks.get( key );
 

@@ -1,4 +1,10 @@
 
+- It would be nice to be able to have three types of benchmarks:
+
+    OperationBenchmark (total number of times something has hapened)
+    TimedBenchmark (total number of times something has happened, total duration, and mean duration)
+    CacheBenchmark (cache hit, miss, and efficiency)
+
 - 
 
     <category name="org" 
