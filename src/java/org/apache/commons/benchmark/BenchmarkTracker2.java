@@ -50,7 +50,7 @@ public class BenchmarkTracker2 {
     /**
      * Keep track of duration.
      */
-    private static BenchmarkThreadLocal threadlocal = new BenchmarkThreadLocal();
+    private static BenchmarkThreadLocal2 threadlocal = new BenchmarkThreadLocal2();
 
     BenchmarkMeta2 now = new BenchmarkMeta2();
     BenchmarkMeta2 last = new BenchmarkMeta2();
@@ -217,7 +217,7 @@ public class BenchmarkTracker2 {
         if ( Benchmark.DISABLE_LOCAL )
             return;
 
-        BenchmarkThreadLocalClosure closure = getClosure();
+        BenchmarkThreadLocal2Closure closure = getClosure();
         
         closure.startedTimeMillis = currentTimeMillis;
         
@@ -228,7 +228,7 @@ public class BenchmarkTracker2 {
         if ( Benchmark.DISABLE_LOCAL )
             return;
 
-        BenchmarkThreadLocalClosure closure = getClosure();
+        BenchmarkThreadLocal2Closure closure = getClosure();
         
         closure.completedTimeMillis = System.currentTimeMillis();
 
@@ -239,8 +239,8 @@ public class BenchmarkTracker2 {
     /**
      * Get the lexical closure for this benchmark.
      */
-    BenchmarkThreadLocalClosure getClosure() {
-        return (BenchmarkThreadLocalClosure)threadlocal.get();
+    BenchmarkThreadLocal2Closure getClosure() {
+        return (BenchmarkThreadLocal2Closure)threadlocal.get();
     }
     
     // **** metadata ************************************************************
@@ -263,13 +263,13 @@ public class BenchmarkTracker2 {
 }
 
 /**
- * Threadlocal which hold BenchmarkThreadLocalClosures.
+ * Threadlocal which hold BenchmarkThreadLocal2Closures.
  *
  */
-class BenchmarkThreadLocal extends ThreadLocal {
+class BenchmarkThreadLocal2 extends ThreadLocal {
 
     public Object initialValue() {
-        return new BenchmarkThreadLocalClosure();
+        return new BenchmarkThreadLocal2Closure();
     }
 
 }
@@ -279,7 +279,7 @@ class BenchmarkThreadLocal extends ThreadLocal {
  * lexical closure so that we don't have to have multiple thread locals each
  * with dedicated objects.
  */
-class BenchmarkThreadLocalClosure {
+class BenchmarkThreadLocal2Closure {
 
     /**
      * The time (in millis) that this benchmark was started.
