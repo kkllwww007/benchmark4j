@@ -178,7 +178,7 @@ public class Test1 extends TestCase {
         //references to strings?
         long usedMemory = after - before;
         System.out.println( "Total bytes used by benchmark: " + usedMemory );
-        if ( false == usedMemory < 500 * count ) {
+        if ( false == usedMemory < 1000 * count ) {
             throw new Exception( "used memory too large: " + usedMemory / count + " bytes per metric" );
         }
 
@@ -271,16 +271,10 @@ public class Test1 extends TestCase {
         long duration = benchmark.getTracker1().now.duration;
         long meanDuration = benchmark.getTracker1().now.getMeanDuration();
 
-        System.out.println( "duration: " + duration );
-        System.out.println( "meanDuration: " + meanDuration );
+        assertTrue("duration=" + duration, duration > 150);
 
-        assertTrue( 0 < duration );
-        assertTrue( 100 < duration );
-        assertTrue( 150 < duration );
-
-        assertTrue( 0 < meanDuration );
-        assertTrue( 100 < meanDuration );
-        assertTrue( 200 > meanDuration );
+        assertTrue("meanDuration=" + meanDuration, meanDuration > 50);
+        assertTrue("meanDuration=" + meanDuration, meanDuration < 150 );
 
         benchmark.clear();
 
@@ -307,9 +301,8 @@ public class Test1 extends TestCase {
         benchmark.complete();
 
         Thread.sleep( 1000 );
-        Thread.sleep( 1000 );
+        Thread.sleep( 2000 );
 
-        assertEquals( 0, benchmark.getTracker1().last.getStarted() );
         assertEquals( 0, benchmark.getTracker1().last.getStarted() );
         assertEquals( 0, benchmark.getTracker1().now.getCompleted() );
         assertEquals( 0, benchmark.getTracker1().now.getDuration() );
@@ -375,7 +368,7 @@ public class Test1 extends TestCase {
         assertEquals( 1, benchmark.getTracker5().now.getStarted() );
         assertEquals( 1, benchmark.getTracker15().now.getCompleted() );
 
-        Thread.sleep( 1000 );
+        Thread.sleep( 3000 );
 
         assertEquals( 0, benchmark.getTracker1().now.started );
 
