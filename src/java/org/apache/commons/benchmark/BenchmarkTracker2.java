@@ -175,6 +175,24 @@ public class BenchmarkTracker2 {
         doLocalCompleted( currentTimeMillis );
 
     }
+    
+    public void value() {
+        value( 1 );
+    }
+
+    public void value( int v ) {
+
+        if ( parent != null && parent.DISABLED  )
+            return;
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        rolloverWhenNecessary( currentTimeMillis );
+        now.value.getAndAdd( v );
+
+        //doLocalCompleted( currentTimeMillis );
+
+    }
 
     void cache_hit() {
 

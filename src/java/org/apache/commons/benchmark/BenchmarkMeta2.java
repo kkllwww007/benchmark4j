@@ -33,7 +33,8 @@ public class BenchmarkMeta2 {
     protected AtomicLong started = new AtomicLong( 0 );
     protected AtomicLong completed = new AtomicLong( 0 );
     protected AtomicLong duration = new AtomicLong( 0 );
-    
+    protected AtomicLong value = new AtomicLong( 0 );
+
     protected AtomicInteger cache_hits = new AtomicInteger( 0 );
     protected AtomicInteger cache_misses = new AtomicInteger( 0 );
     protected AtomicInteger cache_sets = new AtomicInteger( 0 );
@@ -90,6 +91,10 @@ public class BenchmarkMeta2 {
         return cache_sets.get();
     }
 
+    public long getValue() {
+        return value.get();
+    }
+    
     /**
      * Compute the cache interval for this benchmark.  Since the benchmark is
      * interval based this value will change as the interval rolls forward.
@@ -109,6 +114,7 @@ public class BenchmarkMeta2 {
         started.set( 0 );
         completed.set( 0 );
         duration.set( 0 );
+        value.set( 0 );
         cache_misses.set( 0 );
         cache_hits.set( 0 );
         cache_sets.set( 0 );
