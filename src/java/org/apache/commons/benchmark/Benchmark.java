@@ -19,6 +19,7 @@ package org.apache.commons.benchmark;
 import org.apache.commons.benchmark.proxy.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * <p>
@@ -114,7 +115,7 @@ public class Benchmark {
     /**
      * Maintain a metadata map between the name and BMeta classes.
      */
-    static HashMap benchmarks = new HashMap();
+    static Map<String,Benchmark> benchmarks = new ConcurrentHashMap();
 
     /**
      * The current name of this benchmark.
@@ -128,8 +129,8 @@ public class Benchmark {
     /**
      * The current benchmark.
      */
-    BenchmarkTracker tracker1 = null;
-    BenchmarkTracker tracker5 = null;
+    BenchmarkTracker tracker1  = null;
+    BenchmarkTracker tracker5  = null;
     BenchmarkTracker tracker15 = null;
 
     /**
@@ -189,8 +190,8 @@ public class Benchmark {
      */
     void clear() {
 
-        tracker1 = new BenchmarkTracker( INTERVAL_1, this );
-        tracker5 = new BenchmarkTracker( INTERVAL_5, this );
+        tracker1  = new BenchmarkTracker( INTERVAL_1,  this );
+        tracker5  = new BenchmarkTracker( INTERVAL_5,  this );
         tracker15 = new BenchmarkTracker( INTERVAL_15, this );
 
     }
@@ -439,8 +440,7 @@ public class Benchmark {
     void doRegisterWhenNecessary() {
 
         if ( registered == false && name != null ) {
-            benchmarks.put( name, this );
-            registered = true;
+            registerBenchmark( name, this );
         }
 
     }
@@ -583,18 +583,15 @@ public class Benchmark {
         //ConcurrentHashMap but I'm not sure of the performance advantage this
         //would bring.  Ideally we could have this entire library be
         //unsynchronized.
-        synchronized( benchmarks ) {
 
-            Benchmark benchmark = (Benchmark)benchmarks.get( name );
+        Benchmark benchmark = benchmarks.get( name );
 
-            if ( benchmark == null ) {
-                benchmark = new Benchmark( name );
-                registerBenchmark( name, benchmark );
-            }
-
-            return benchmark;
-            
+        if ( benchmark == null ) {
+            benchmark = new Benchmark( name );
+            registerBenchmark( name, benchmark );
         }
+
+        return benchmark;
 
     }	
 
@@ -613,24 +610,20 @@ public class Benchmark {
         
         try {
 
-            synchronized( benchmarks ) {
+            Iterator it = benchmarks.keySet().iterator();
 
-                Iterator it = benchmarks.keySet().iterator();
+            while ( it.hasNext() ) {
 
-                while ( it.hasNext() ) {
+                key = (String)it.next();
 
-                    key = (String)it.next();
+                Benchmark b = benchmarks.get( key );
 
-                    Benchmark b = (Benchmark)benchmarks.get( key );
-
-                    if ( b == null )
-                        continue;
-                    
-                    result.put( b.getName(), b.toString() );
-                    
-                } 
-
-            }
+                if ( b == null )
+                    continue;
+                
+                result.put( b.getName(), b.toString() );
+                
+            } 
 
         } catch ( Exception t ) {
             throw new Exception( "Caught exception on key: " + key , t );
@@ -645,10 +638,8 @@ public class Benchmark {
      */
     static void registerBenchmark( String name, Benchmark b ) {
 
-        synchronized( benchmarks ) {
-            benchmarks.put( name, b );
-            b.registered = true;
-        }
+        benchmarks.put( name, b );
+        b.registered = true;
 
     }
 
@@ -663,7 +654,7 @@ public class Benchmark {
         //implementation.
         Hashtable result = new Hashtable();
         
-        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+        Benchmark benchmark = Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null ) {
             return result;

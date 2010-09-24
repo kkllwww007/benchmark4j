@@ -39,7 +39,7 @@ public class BenchmarkHandler {
      */
     public Map getBenchmarkAsHashtable( String name ) {
 
-        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+        Benchmark benchmark = Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null )
             return EMPTY_MAP;
@@ -56,7 +56,7 @@ public class BenchmarkHandler {
 
     public Map getBenchmarkAsHashtable2( String name ) {
 
-        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+        Benchmark benchmark = Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null )
             return Collections.EMPTY_MAP;
