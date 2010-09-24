@@ -165,49 +165,6 @@ public class BenchmarkTracker {
 
     }
 
-    void cache_hit() {
-
-        if ( parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.cache_hits;
-        }
-
-    }
-
-    void cache_miss() {
-
-        if ( parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.cache_misses;
-        }
-
-    }
-
-    void cache_set() {
-
-        if ( parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-        }
-
-        ++now.cache_sets;
-
-    }
-
     void doLocalStart( long currentTimeMillis ) {
 
         if ( Benchmark.DISABLE_LOCAL )

@@ -97,16 +97,6 @@ public class BenchmarkHandler {
         map.put( prefix + "completed", new Double( meta.getCompleted() ) );
         map.put( prefix + "started", new Double( meta.getStarted() ) );
 
-        //cache benchmarks have additional metadata.
-        if ( benchmark instanceof CacheBenchmark ) {
-
-            map.put( prefix + "cache_hits", new Integer( meta.getCacheHits() ) );
-            map.put( prefix + "cache_misses", new Integer( meta.getCacheMisses() ) );
-            map.put( prefix + "cache_sets", new Integer( meta.getCacheSets() ) );
-            map.put( prefix + "cache_efficiency", new Double( meta.getCacheEfficiency() ) );
-
-        }
-
     }
 
 }

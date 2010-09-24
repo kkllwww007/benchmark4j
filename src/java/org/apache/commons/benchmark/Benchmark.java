@@ -17,6 +17,7 @@
 package org.apache.commons.benchmark;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * <p> Benchmark that allows cheap and lightweight "benchmarking" of arbitrary
@@ -54,12 +55,6 @@ import java.util.*;
  * }
  * 
  * </code>
- * 
- * <p> The framework also supports caching frameworks benchmarking including
- * cache hits/misses and computing cache efficiency.  Simply call
- * benchmark.cache_hit() and benchmark.cache_miss() in your caching framework.
- * This was designed for use within Java LRU caching frameworks and for use
- * within Memcached.
  * 
  * <p>
  * The method overhead is very light. One a modern machine you can perform about
@@ -108,7 +103,7 @@ public class Benchmark {
     /**
      * Maintain a metadata map between the name and BMeta classes.
      */
-    static HashMap benchmarks = new HashMap();
+    static Map<String,Benchmark> benchmarks = new ConcurrentHashMap();
 
     /**
      * The current name of this benchmark.
@@ -344,60 +339,6 @@ public class Benchmark {
         
     }
 
-    public void cache_hit() {
-
-        if ( DISABLED )
-            return;
-
-        if ( requiresFullInit ) {
-            initCaller( true );
-            clear();
-        }
-
-        doRegisterWhenNecessary();
-        
-        tracker1.cache_hit();
-        tracker5.cache_hit();
-        tracker15.cache_hit();
-        
-    }
-
-    public void cache_miss() {
-
-        if ( DISABLED  )
-            return;
-
-        if ( requiresFullInit ) {
-            initCaller( true );
-            clear();
-        }
-
-        doRegisterWhenNecessary();
-        
-        tracker1.cache_miss();
-        tracker5.cache_miss();
-        tracker15.cache_miss();
-        
-    }
-
-    public void cache_set() {
-
-        if ( DISABLED  )
-            return;
-
-        if ( requiresFullInit ) {
-            initCaller( true );
-            clear();
-        }
-
-        doRegisterWhenNecessary();
-        
-        tracker1.cache_set();
-        tracker5.cache_set();
-        tracker15.cache_set();
-        
-    }
-
     /**
      * Register this with the system for just in time bencmarks.
      *
@@ -483,24 +424,18 @@ public class Benchmark {
         
         try {
 
-            synchronized( benchmarks ) {
+            for( String k : benchmarks.keySet() ) {
 
-                Iterator it = benchmarks.keySet().iterator();
+                key = k;
+                
+                Benchmark b = benchmarks.get( key );
 
-                while ( it.hasNext() ) {
-
-                    key = (String)it.next();
-
-                    Benchmark b = (Benchmark)benchmarks.get( key );
-
-                    if ( b == null )
-                        continue;
-                    
-                    result.put( b.getName(), b.toString() );
-                    
-                } 
-
-            }
+                if ( b == null )
+                    continue;
+                
+                result.put( b.getName(), b.toString() );
+                
+            } 
 
         } catch ( Exception t ) {
             throw new Exception( "Caught exception on key: " + key , t );
@@ -515,10 +450,8 @@ public class Benchmark {
      */
     static void registerBenchmark( String name, Benchmark b ) {
 
-        synchronized( benchmarks ) {
-            benchmarks.put( name, b );
-            b.registered = true;
-        }
+        benchmarks.put( name, b );
+        b.registered = true;
 
     }
 
@@ -533,7 +466,7 @@ public class Benchmark {
         //implementation.
         Hashtable result = new Hashtable();
         
-        Benchmark benchmark = (Benchmark)Benchmark.getBenchmarks().get( name );
+        Benchmark benchmark = Benchmark.getBenchmarks().get( name );
 
         if ( benchmark == null ) {
             return result;
@@ -578,7 +511,7 @@ public class Benchmark {
      *
      * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
      */
-    public static Map getBenchmarks() {
+    public static Map<String,Benchmark> getBenchmarks() {
         return benchmarks;
     }
 
