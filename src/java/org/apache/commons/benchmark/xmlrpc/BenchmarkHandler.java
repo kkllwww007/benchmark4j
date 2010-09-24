@@ -109,45 +109,5 @@ public class BenchmarkHandler {
 
     }
 
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Map getBenchmark( String name ) {
-        return getBenchmarkAsHashtable( name );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastStarted( String name ) {
-
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getStarted() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastCompleted( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getCompleted() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getDuration() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastMeanDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getMeanDuration() );
-    }
-
 }
 

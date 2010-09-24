@@ -16,23 +16,17 @@
 
 package org.apache.commons.benchmark;
 
-import org.apache.commons.benchmark.proxy.*;
-
 import java.util.*;
 
 /**
- * <p>
- * Benchmark that allows cheap and lightweight "benchmarking" (go figure) of
- * arbitrary code.  All you have to do is call start() every time a method
- * starts which will then increment the benchmark and perform any operations
- * necessary to maintain the benchmark.  Just call complete() when your method
- * is done.  
+ * <p> Benchmark that allows cheap and lightweight "benchmarking" of arbitrary
+ * code.  All one has to do is call start() every time a method starts which
+ * will then increment the benchmark and perform any operations necessary to
+ * maintain the benchmark.  Call complete() when your operation is done.
  * 
  * <p>
- * This class is lightweight (only requires a hashmap entry, and 32 bytes per
- * benchmark of storage with no external requirements.  This class is also
- * threadsafe so if you need to call this from multithreaded code to benchmark
- * then you'll be ok.
+ * This class is also * threadsafe so if you need to call this from multithreaded
+ * code to benchmark * then you'll be ok.
  *
  * <p>
  * The benchmark is maintained as number of starts and completes per minute.
@@ -189,8 +183,8 @@ public class Benchmark {
      */
     void clear() {
 
-        tracker1 = new BenchmarkTracker( INTERVAL_1, this );
-        tracker5 = new BenchmarkTracker( INTERVAL_5, this );
+        tracker1  = new BenchmarkTracker( INTERVAL_1, this );
+        tracker5  = new BenchmarkTracker( INTERVAL_5, this );
         tracker15 = new BenchmarkTracker( INTERVAL_15, this );
 
     }
@@ -350,18 +344,6 @@ public class Benchmark {
         
     }
 
-    /**
-     * Used to compute stats on items that have absolute values and don't
-     * necessary have start/complete cycles.  This is internally mapped to
-     * start/complete for simplict.
-     */
-    public void increment( String name ) {
-
-        start( name );
-        complete( name );
-        
-    }
-
     public void cache_hit() {
 
         if ( DISABLED )
@@ -417,22 +399,6 @@ public class Benchmark {
     }
 
     /**
-     * @deprecated use child( "foo" ).start()
-     */
-    public void start( String name ) {
-        Benchmark child = child( name );
-        child.start();
-    }
-
-    /**
-     * @deprecated use CallerBenchmark
-     */
-    public void complete( String name ) {
-        Benchmark child = child( name );
-        child.complete();
-    }
-    
-    /**
      * Register this with the system for just in time bencmarks.
      *
      */
@@ -443,20 +409,6 @@ public class Benchmark {
             registered = true;
         }
 
-    }
-    
-    /**
-     * Return a child benchmark of the current method.  This can be used to
-     * return a benchmark for a specific method based on a benchmark for a
-     * class.  The resulting name will have parent#name semantics.
-     *
-     * @deprecated use CallerBenchmark
-     * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
-     */
-    public Benchmark child( String name ) {
-
-        return getBenchmark( this.name + "." + name );
-        
     }
 
     /**
@@ -515,88 +467,6 @@ public class Benchmark {
         return null;
 
     }
-
-    public static Object getBenchmarkAsProxy( Object _instance, Class _interface ) {
-
-        return BenchmarkProxyFactory.newBenchmarkFactory( _instance, _interface );
-        
-    }
-
-    /**
-     * Factory method for obtaining a benchmark.  This method uses the callers
-     * classname by performing a quick stack analysis.  Note that this is slow
-     * and you should cache your benchmarks in a static variable.
-     *
-     * @deprecated use CallerBenchmark
-     */
-    public static Benchmark getBenchmark() {
-
-        String name = getCallerClassname();
-        return getBenchmark( name );
-
-    }
-
-    /**
-     * Factory method for obtaining a benchmark by classname
-     * 
-     * @deprecated use CallerBenchmark instead of static instance.
-     */
-    public static Benchmark getBenchmark( Class clazz ) {
-        return getBenchmark( clazz.getName() );
-    }
-
-    /**
-     * Create a benchmark on a the caller when performing a specific operation
-     * on a given target object..  For example if your class is 'org.apache.Foo'
-     * and the operation is 'bar' then the resulting benchmark name will be
-     * 'org.apache.Foo#bar'.  When the target is null the name of the caller is
-     * used. This means we won't throw an NPE and it also means we have similar
-     * operation to child(),
-     * 
-     * @deprecated use CallerBenchmark instead of static instance.
-     */
-    public static Benchmark getBenchmark( Object target,
-                                          String operation ) {
-
-        String prefix = null;
-
-        if ( target == null ) {
-            prefix = getCallerClassname();
-        } else {
-            prefix = target.getClass().getName();
-        }
-
-        String name = prefix + "#" + operation;
-
-        return getBenchmark( name );
-        
-    }
-    
-    /**
-     * Factory method for obtaining a benchmark by name
-     *
-     * @deprecated use CallerBenchmark
-     */
-    public static Benchmark getBenchmark( String name ) {
-
-        //we have to synchronize on this hashmap I'm afraid.  I could use a
-        //ConcurrentHashMap but I'm not sure of the performance advantage this
-        //would bring.  Ideally we could have this entire library be
-        //unsynchronized.
-        synchronized( benchmarks ) {
-
-            Benchmark benchmark = (Benchmark)benchmarks.get( name );
-
-            if ( benchmark == null ) {
-                benchmark = new Benchmark( name );
-                registerBenchmark( name, benchmark );
-            }
-
-            return benchmark;
-            
-        }
-
-    }	
 
     /**
      * Get all benchmarks as a map to be used by an external syste.  toString()
