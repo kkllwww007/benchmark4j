@@ -699,7 +699,7 @@ public class Benchmark {
      *
      * @author <a href="mailto:burton@tailrank.com">Kevin A. Burton</a>
      */
-    public static Map getBenchmarks() {
+    public static Map<String,Benchmark> getBenchmarks() {
         return benchmarks;
     }
 
