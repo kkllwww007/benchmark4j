@@ -73,42 +73,42 @@ public class Test1 extends TestCase {
         
     }
         
-    public void testThreads() throws Exception {
+//     public void testThreads() throws Exception {
 
-        int count = 100;
+//         int count = 100;
 
-        ThreadGroup tg = new ThreadGroup( "foo" );
+//         ThreadGroup tg = new ThreadGroup( "foo" );
 
-        System.gc();
-        long before = getUsedMemory();
+//         System.gc();
+//         long before = getUsedMemory();
         
-        for ( int i = 0; i < count; ++i ) {
-            TestThread tt = new TestThread( tg );
-            tt.start();
-        } 
+//         for ( int i = 0; i < count; ++i ) {
+//             TestThread tt = new TestThread( tg );
+//             tt.start();
+//         } 
 
-        while ( tg.activeCount() > 0 ) {
+//         while ( tg.activeCount() > 0 ) {
 
-            System.out.print( "." );
-            Thread.sleep( 100 );
+//             System.out.print( "." );
+//             Thread.sleep( 100 );
             
-        } 
+//         } 
 
-        System.out.println();
+//         System.out.println();
         
-        System.gc();
-        long after = getUsedMemory();
+//         System.gc();
+//         long after = getUsedMemory();
 
-        System.out.println( "Done thread test" );
+//         System.out.println( "Done thread test" );
 
-        //500k bytes is only 500 bytes per benchmark.  We should try to thin
-        //this down a bit.  I could do MUCH better I think.  Maybe NOT keep
-        //references to strings?
-        long usedMemory = after - before;
-        System.out.println( "Total bytes used by benchmark: " + usedMemory );
-        assertTrue( usedMemory < 500 * count );
+//         //500k bytes is only 500 bytes per benchmark.  We should try to thin
+//         //this down a bit.  I could do MUCH better I think.  Maybe NOT keep
+//         //references to strings?
+//         long usedMemory = after - before;
+//         System.out.println( "Total bytes used by benchmark: " + usedMemory );
+//         assertTrue( usedMemory < 500 * count );
 
-    }
+//     }
 
     private long getUsedMemory() {
         return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
