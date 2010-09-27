@@ -117,8 +117,8 @@ public class Benchmark {
     /**
      * The current benchmark.
      */
-    BenchmarkTracker tracker1 = null;
-    BenchmarkTracker tracker5 = null;
+    BenchmarkTracker tracker1  = null;
+    BenchmarkTracker tracker5  = null;
     BenchmarkTracker tracker15 = null;
 
     /**
@@ -178,8 +178,8 @@ public class Benchmark {
      */
     void clear() {
 
-        tracker1  = new BenchmarkTracker( INTERVAL_1, this );
-        tracker5  = new BenchmarkTracker( INTERVAL_5, this );
+        tracker1  = new BenchmarkTracker( INTERVAL_1,  this );
+        tracker5  = new BenchmarkTracker( INTERVAL_5,  this );
         tracker15 = new BenchmarkTracker( INTERVAL_15, this );
 
     }
@@ -346,8 +346,7 @@ public class Benchmark {
     void doRegisterWhenNecessary() {
 
         if ( registered == false && name != null ) {
-            benchmarks.put( name, this );
-            registered = true;
+            registerBenchmark( name, this );
         }
 
     }
