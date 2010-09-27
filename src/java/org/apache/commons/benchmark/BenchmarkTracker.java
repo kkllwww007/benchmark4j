@@ -262,7 +262,7 @@ public class BenchmarkTracker {
  * Threadlocal which hold BenchmarkThreadLocalClosures.
  *
  */
-class BenchmarkThreadLocal extends ThreadLocal {
+class BenchmarkThreadLocal extends StrongThreadLocal {
 
     public Object initialValue() {
         return new BenchmarkThreadLocalClosure();

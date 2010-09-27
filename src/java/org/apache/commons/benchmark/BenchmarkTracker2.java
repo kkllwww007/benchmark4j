@@ -284,7 +284,7 @@ public class BenchmarkTracker2 {
  * Threadlocal which hold BenchmarkThreadLocal2Closures.
  *
  */
-class BenchmarkThreadLocal2 extends ThreadLocal {
+class BenchmarkThreadLocal2 extends StrongThreadLocal {
 
     public Object initialValue() {
         return new BenchmarkThreadLocal2Closure();
