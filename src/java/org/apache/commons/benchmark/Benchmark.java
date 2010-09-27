@@ -224,6 +224,10 @@ public class Benchmark {
      * the caller.
      */
     public String getName() {
+
+        //TODO: what do we do if this is a caller benchmark but has not been
+        //start()ed yet?
+        
         return name;
     }
 

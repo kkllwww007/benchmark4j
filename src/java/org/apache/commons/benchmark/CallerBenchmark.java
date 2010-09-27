@@ -103,49 +103,6 @@ public class CallerBenchmark extends Benchmark {
         return new CallerInfo( lineNumber, method, classname );
     }
 
-    public CallerBenchmark child( String name ) {
-        return child( name, false );
-    }
-
-    /**
-     * Create a new child benchmark based on this given benchmark name as a
-     * prefix and the target name as a suffix.  If
-     * <code>sendCallsToParent</code> is true we will also call methods on the
-     * parent benchmark when necessary.
-     */
-    public CallerBenchmark child( String name,
-                                  boolean sendCallsToParent ) {
-
-        beforeMetric();
-
-        StringBuilder buff = new StringBuilder( 128 );
-
-        buff.append( super.getName() )
-            .append( "." )
-            .append( name )
-            ;
-        
-        String key = buff.toString();
-
-        //we have to synchronize on this hashmap I'm afraid.  I could use a
-        //ConcurrentHashMap but I'm not sure of the performance advantage here
-        //and if it is worth switching. 
-        synchronized( benchmarks ) {
-            
-            CallerBenchmark child = (CallerBenchmark)benchmarks.get( key );
-
-            if ( child == null ) {
-                child = new CallerBenchmark( key );
-                child.sink = this;
-                registerBenchmark( key, child );
-            }
-
-            return child;
-
-        }
-        
-    }
-
     /**
      * @see Benchmark.start
      */
