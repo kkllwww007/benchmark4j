@@ -79,33 +79,6 @@ public class BenchmarkMeta {
         return duration > 0 ? duration / completed : 0;
     }
 
-    public int getCacheHits() {
-        return cache_hits;
-    }
-
-    public int getCacheMisses() {
-        return cache_hits;
-    }
-
-    public int getCacheSets() {
-        return cache_sets;
-    }
-
-    /**
-     * Compute the cache interval for this benchmark.  Since the benchmark is
-     * interval based this value will change as the interval rolls forward.
-     */
-    public double getCacheEfficiency() {
-
-        int cache_total = cache_misses + cache_hits;
-
-        if ( cache_total == 0 )
-            return 0;
-
-        return ((double)cache_hits / (double)cache_total) * (double)100;
-
-    }
-
     public void reset() {
         started = 0;
         completed = 0;

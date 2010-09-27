@@ -16,12 +16,9 @@
 
 package org.apache.commons.benchmark;
 
-import org.apache.commons.benchmark.proxy.*;
-
 import java.util.*;
 
 /**
- *
  * 
  * <p> Benchmark impl which allows one to trace the caller classname, method,
  * and line number without the complexity of hard coding this information into

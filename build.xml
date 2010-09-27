@@ -5,7 +5,7 @@
     <property environment="env"/>
 
     <property name="project" value="benchmark4j"/>
-    <property name="version" value="1.0.1"/>
+    <property name="version" value="2.0.0-beta1"/>
 
     <path id="project.classpath">
 
@@ -25,8 +25,8 @@
 
         <javac classpathref="project.classpath"
                nowarn="on"
-               source="1.5"
-               target="1.5"
+               source="1.6"
+               target="1.6"
                srcdir="src/java"
                destdir="target/classes"
                debug="true">
