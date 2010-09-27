@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<project name="benchmark4j" default="jar" basedir=".">
+<project name="benchmark4j" 
+         default="jar" 
+         basedir=".">
 
     <property environment="env"/>
 
@@ -10,11 +12,10 @@
     <path id="project.classpath">
 
         <pathelement location="compile"/>
+        <pathelement location="target/classes"/>
 
         <fileset dir="lib">
-
              <include name="*.jar"/>
-
         </fileset>
 
     </path>
@@ -25,8 +26,8 @@
 
         <javac classpathref="project.classpath"
                nowarn="on"
-               source="1.5"
-               target="1.5"
+               source="1.6"
+               target="1.6"
                srcdir="src/java"
                destdir="target/classes"
                debug="true">
@@ -71,6 +72,70 @@
 
         <gzip src="target/${project}-${version}.tar" destfile="target/${project}-${version}.tar.gz"/>
         <delete file="target/${project}-${version}.tar"/>
+
+    </target>
+
+    <target name="compile.test">
+
+        <taskdef name="junit"
+                 classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+            <classpath refid="project.classpath"/>
+        </taskdef>	
+
+        <mkdir dir="target/classes"/>
+
+        <javac classpathref="project.classpath"
+               nowarn="on"
+               source="1.6"
+               target="1.6"
+               srcdir="src/test"
+               destdir="target/classes"
+               fork="true"
+               memoryMaximumSize="512M"
+               deprecation="no"
+               debug="true">
+            <include name="**/*.java"/>
+            <exclude name="**/*SExpander.java"/>
+        </javac>
+
+    </target>
+
+    <target name="test" 
+            depends="compile,compile.test" 
+            description="Run junit tests.">
+
+        <!-- defining by -Dfoo=bar works -->
+
+        <mkdir dir="target"/>
+        <mkdir dir="target/test-reports"/>
+
+        <taskdef name="junit"
+                 classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
+            <classpath refid="project.classpath"/>
+        </taskdef>	
+
+        <junit printsummary="withOutAndErr"
+               filtertrace="on"
+               haltonfailure="on"
+               showoutput="on"
+               fork="true"
+               haltonerror="on">
+
+            <formatter type="plain" usefile="false"/>
+
+            <classpath>
+                <path refid="project.classpath"/>
+            </classpath>
+
+            <batchtest todir="target/test-reports"> 
+
+                <fileset dir="src/test">
+                    <include name="**/Test*.java"/>
+                </fileset>
+
+            </batchtest>
+
+        </junit>
 
     </target>
 

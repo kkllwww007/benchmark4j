@@ -19,8 +19,6 @@ package org.apache.commons.benchmark;
 import org.apache.commons.benchmark.*;
 import org.apache.commons.benchmark.xmlrpc.*;
 
-import org.apache.xmlrpc.*;
-
 import junit.framework.*;
 
 import java.util.*;
