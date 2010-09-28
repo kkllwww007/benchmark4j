@@ -194,42 +194,6 @@ public class BenchmarkTracker2 {
 
     }
 
-    void cache_hit() {
-
-        if ( parent != null && parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        rolloverWhenNecessary( currentTimeMillis );
-        now.cache_hits.getAndIncrement();
-
-    }
-
-    void cache_miss() {
-
-        if ( parent != null && parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        rolloverWhenNecessary( currentTimeMillis );
-        now.cache_misses.getAndIncrement();
-
-    }
-
-    void cache_set() {
-
-        if ( parent != null && parent.DISABLED  )
-            return;
-
-        long currentTimeMillis = System.currentTimeMillis();
-
-        rolloverWhenNecessary( currentTimeMillis );
-        now.cache_sets.getAndIncrement();
-
-    }
-
     void doLocalStart( long currentTimeMillis ) {
 
         if ( Benchmark.DISABLE_LOCAL )

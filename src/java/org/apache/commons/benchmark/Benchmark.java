@@ -292,12 +292,14 @@ public class Benchmark {
         if ( DISABLED  )
             return;
 
-        //only allow one concurrent init so that 
-        synchronized( FULL_INIT_MUTEX ) {
+        //only allow one concurrent init so that
 
-            if ( requiresFullInit ) {
-                initCaller( true );
-                clear();
+        if ( requiresFullInit ) {
+            synchronized( FULL_INIT_MUTEX ) {
+                if ( requiresFullInit ) {
+                    initCaller( true );
+                    clear();
+                }
             }
         }
 
