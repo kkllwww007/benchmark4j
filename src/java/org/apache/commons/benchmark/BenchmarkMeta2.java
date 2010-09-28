@@ -107,7 +107,7 @@ public class BenchmarkMeta2 {
     /**
      * Provide the benchmark metadata as a map for use with external systems.
      */
-    public Map toMap() {
+    public Map<String,Long> toMap() {
 
         Map<String,Long> map = new HashMap();
 

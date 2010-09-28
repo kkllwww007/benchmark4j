@@ -72,7 +72,8 @@ public class BenchmarkTracker {
     }
 
     BenchmarkTracker rollover() {
-        rollover( System.currentTimeMillis() );
+        long currentTimeMillis = System.currentTimeMillis();
+        rollover( currentTimeMillis );
         return this;
     }
 
@@ -85,14 +86,9 @@ public class BenchmarkTracker {
 
         //need to perform a swap and save the current benchmark.
         last = now;
-
-        //FIXME: we could use a daemon thread to handle automatic rollover so
-        //that we don't miss anything if a metric just isn't being called very
-        //often.  Further, we should be able to read the 'last' metrics without
-        //having to block.1
         
         //if we've slept for too long we have to start fresh
-        if ( currentTimeMillis - last.timestamp > (interval * 2) ) {
+        if ( currentTimeMillis - last.timestamp.get() > (interval * 2) ) {
             last.reset();
         } 
 
@@ -104,7 +100,7 @@ public class BenchmarkTracker {
         //swapping the last and now values since the last would just be
         //discarded anyway.
         now = new BenchmarkMeta();
-        now.timestamp = currentTimeMillis;
+        now.timestamp.set( currentTimeMillis );
 
         //this isn't needed since it's a new benchmark.
         //now.reset();
@@ -122,28 +118,32 @@ public class BenchmarkTracker {
      */
     BenchmarkTracker rolloverWhenNecessary( long currentTimeMillis ) {
 
-        if ( currentTimeMillis - now.timestamp > interval )
-            rollover( currentTimeMillis );
+        if ( isExpired( currentTimeMillis ) ) {
+            synchronized( MUTEX ) {
+                //double check idiom
+                if ( isExpired( currentTimeMillis ) ) {
+                    rollover( currentTimeMillis );
+                }
+            }
+        }
 
         return this;
         
     }
 
+    boolean isExpired( long currentTimeMillis ) {
+        return currentTimeMillis - now.timestamp.get() > interval;
+    }
+
     void start() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        //we need to synchronize on this individual metadata unit because if we
-        //didn't then another thread could come in, and corrupt our metadata
-        //about this benchmark.  Since benchmarks are often performed within
-        //threads this is important.
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.started;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.started.getAndIncrement();
 
         doLocalStart( currentTimeMillis );
 
@@ -151,17 +151,33 @@ public class BenchmarkTracker {
 
     void complete() {
 
-        if ( parent.DISABLED  )
+        if ( parent != null && parent.DISABLED  )
             return;
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        synchronized( MUTEX ) {
-            rolloverWhenNecessary( currentTimeMillis );
-            ++now.completed;
-        }
+        rolloverWhenNecessary( currentTimeMillis );
+        now.completed.getAndIncrement();
         
         doLocalCompleted( currentTimeMillis );
+
+    }
+    
+    public void value() {
+        value( 1 );
+    }
+
+    public void value( int v ) {
+
+        if ( parent != null && parent.DISABLED  )
+            return;
+
+        long currentTimeMillis = System.currentTimeMillis();
+
+        rolloverWhenNecessary( currentTimeMillis );
+        now.value.getAndAdd( v );
+
+        //doLocalCompleted( currentTimeMillis );
 
     }
 
@@ -185,7 +201,7 @@ public class BenchmarkTracker {
         
         closure.completedTimeMillis = System.currentTimeMillis();
 
-        now.duration += closure.completedTimeMillis - closure.startedTimeMillis;
+        now.duration.getAndAdd( closure.completedTimeMillis - closure.startedTimeMillis );
         
     }
 

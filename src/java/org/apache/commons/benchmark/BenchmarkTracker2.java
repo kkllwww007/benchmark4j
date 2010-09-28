@@ -72,7 +72,8 @@ public class BenchmarkTracker2 {
     }
 
     BenchmarkTracker2 rollover() {
-        rollover( System.currentTimeMillis() );
+        long currentTimeMillis = System.currentTimeMillis();
+        rollover( currentTimeMillis );
         return this;
     }
 
@@ -124,16 +125,12 @@ public class BenchmarkTracker2 {
     BenchmarkTracker2 rolloverWhenNecessary( long currentTimeMillis ) {
 
         if ( isExpired( currentTimeMillis ) ) {
-
             synchronized( MUTEX ) {
-
                 //double check idiom
                 if ( isExpired( currentTimeMillis ) ) {
                     rollover( currentTimeMillis );
                 }
-
             }
-            
         }
 
         return this;
@@ -151,10 +148,6 @@ public class BenchmarkTracker2 {
 
         long currentTimeMillis = System.currentTimeMillis();
 
-        //we need to synchronize on this individual metadata unit because if we
-        //didn't then another thread could come in, and corrupt our metadata
-        //about this benchmark.  Since benchmarks are often performed within
-        //threads this is important.
         rolloverWhenNecessary( currentTimeMillis );
         now.started.getAndIncrement();
 

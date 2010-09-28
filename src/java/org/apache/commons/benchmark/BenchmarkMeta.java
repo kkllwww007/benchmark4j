@@ -18,6 +18,7 @@ package org.apache.commons.benchmark;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.atomic.*;
 
 /**
  * Used to represent metadata for a benchmark including name, timestamp,
@@ -28,23 +29,17 @@ import java.util.HashMap;
  */
 public class BenchmarkMeta {
 
-    long timestamp = -1;
+    protected AtomicLong timestamp = new AtomicLong( -1 );
+    protected AtomicLong started = new AtomicLong( 0 );
+    protected AtomicLong completed = new AtomicLong( 0 );
+    protected AtomicLong duration = new AtomicLong( 0 );
+    protected AtomicLong value = new AtomicLong( 0 );
 
-    long started = 0;
-
-    long completed = 0;
-
-    long duration = 0;
-
-    int cache_hits = 0;
-    int cache_misses = 0;
-    int cache_sets = 0;
-    
     /**
      * The time the current benchmark was started.  -1 for never started.
      */
     public long getTimestamp() {
-        return timestamp;
+        return timestamp.get();
     }
     
     /**
@@ -52,7 +47,7 @@ public class BenchmarkMeta {
      * runtime but its recommended that you use lastCompleted, lastStarted
      */
     public long getStarted() {
-        return started;
+        return started.get();
     }
 
     /**
@@ -60,7 +55,7 @@ public class BenchmarkMeta {
      * runtime but its recommended that you use lastCompleted, lastStarted
      */
     public long getCompleted() {
-        return completed;
+        return completed.get();
     }
 
     /**
@@ -69,23 +64,26 @@ public class BenchmarkMeta {
      * computed by duration / completed.
      */
     public long getDuration() {
-        return duration;
+        return duration.get();
     }
 
     /**
      * Total mean duration.
      */
     public long getMeanDuration() {
-        return duration > 0 ? duration / completed : 0;
+
+        return duration.get() > 0 ? duration.get() / completed.get() : 0;
+    }
+
+    public long getValue() {
+        return value.get();
     }
 
     public void reset() {
-        started = 0;
-        completed = 0;
-        duration = 0;
-        cache_misses = 0;
-        cache_hits = 0;
-        cache_sets = 0;
+        started.set( 0 );
+        completed.set( 0 );
+        duration.set( 0 );
+        value.set( 0 );
     }
 
     public String toString() {
@@ -109,7 +107,7 @@ public class BenchmarkMeta {
     /**
      * Provide the benchmark metadata as a map for use with external systems.
      */
-    public Map toMap() {
+    public Map<String,Long> toMap() {
 
         Map<String,Long> map = new HashMap();
 
