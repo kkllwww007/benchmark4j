@@ -230,7 +230,7 @@ public class Test1 extends TestCase {
         Thread.sleep( 100 );
         benchmark.complete();
 
-        long duration = benchmark.getTracker1().now.duration;
+        long duration = benchmark.getTracker1().now.getDuration();
         long meanDuration = benchmark.getTracker1().now.getMeanDuration();
 
         assertTrue("duration=" + duration, duration > 150);
@@ -310,10 +310,10 @@ public class Test1 extends TestCase {
 
         Thread.sleep( 3000 );
 
-        assertEquals( 0, benchmark.getTracker1().now.started );
+        assertEquals( 0, benchmark.getTracker1().now.getStarted() );
 
         Thread.sleep( 5000 );
-        assertEquals( 0, benchmark.getTracker5().now.started );
+        assertEquals( 0, benchmark.getTracker5().now.getStarted() );
 
         //reset all the trackers
         benchmark.clear();
