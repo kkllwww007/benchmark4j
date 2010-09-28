@@ -7,7 +7,7 @@
     <property environment="env"/>
 
     <property name="project" value="benchmark4j"/>
-    <property name="version" value="1.0.1"/>
+    <property name="version" value="2.0.0-beta1"/>
 
     <path id="project.classpath">
 

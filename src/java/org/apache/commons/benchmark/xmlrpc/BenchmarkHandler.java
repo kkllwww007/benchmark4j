@@ -97,56 +97,6 @@ public class BenchmarkHandler {
         map.put( prefix + "completed", new Double( meta.getCompleted() ) );
         map.put( prefix + "started", new Double( meta.getStarted() ) );
 
-        //cache benchmarks have additional metadata.
-        if ( benchmark instanceof CacheBenchmark ) {
-
-            map.put( prefix + "cache_hits", new Integer( meta.getCacheHits() ) );
-            map.put( prefix + "cache_misses", new Integer( meta.getCacheMisses() ) );
-            map.put( prefix + "cache_sets", new Integer( meta.getCacheSets() ) );
-            map.put( prefix + "cache_efficiency", new Double( meta.getCacheEfficiency() ) );
-
-        }
-
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Map getBenchmark( String name ) {
-        return getBenchmarkAsHashtable( name );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastStarted( String name ) {
-
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getStarted() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastCompleted( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getCompleted() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getDuration() );
-    }
-
-    /**
-     * @deprecated use getBenchmarkAsHashtable
-     */
-    public Double getLastMeanDuration( String name ) {
-        return new Double( Benchmark.getBenchmark( name )
-                           .getTracker1().getLast().getMeanDuration() );
     }
 
 }
