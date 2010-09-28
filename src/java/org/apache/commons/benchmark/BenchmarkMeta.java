@@ -29,17 +29,21 @@ import java.util.concurrent.atomic.*;
  */
 public class BenchmarkMeta {
 
-    protected AtomicLong timestamp = new AtomicLong( -1 );
-    protected AtomicLong started = new AtomicLong( 0 );
-    protected AtomicLong completed = new AtomicLong( 0 );
-    protected AtomicLong duration = new AtomicLong( 0 );
-    protected AtomicLong value = new AtomicLong( 0 );
+    protected AtomicLong timestamp   = new AtomicLong( -1 );
+    protected AtomicLong started     = new AtomicLong( 0 );
+    protected AtomicLong completed   = new AtomicLong( 0 );
+    protected AtomicLong duration    = new AtomicLong( 0 );
+    protected AtomicLong value       = new AtomicLong( 0 );
 
     /**
      * The time the current benchmark was started.  -1 for never started.
      */
     public long getTimestamp() {
         return timestamp.get();
+    }
+
+    void setTimestamp( long v ) {
+        timestamp.set( v );
     }
     
     /**

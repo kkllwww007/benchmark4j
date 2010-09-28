@@ -88,7 +88,7 @@ public class BenchmarkTracker {
         last = now;
         
         //if we've slept for too long we have to start fresh
-        if ( currentTimeMillis - last.timestamp.get() > (interval * 2) ) {
+        if ( currentTimeMillis - last.getTimestamp() > (interval * 2) ) {
             last.reset();
         } 
 
@@ -100,7 +100,7 @@ public class BenchmarkTracker {
         //swapping the last and now values since the last would just be
         //discarded anyway.
         now = new BenchmarkMeta();
-        now.timestamp.set( currentTimeMillis );
+        now.setTimestamp( currentTimeMillis );
 
         //this isn't needed since it's a new benchmark.
         //now.reset();
@@ -132,7 +132,7 @@ public class BenchmarkTracker {
     }
 
     boolean isExpired( long currentTimeMillis ) {
-        return currentTimeMillis - now.timestamp.get() > interval;
+        return currentTimeMillis - now.getTimestamp() > interval;
     }
 
     void start() {
