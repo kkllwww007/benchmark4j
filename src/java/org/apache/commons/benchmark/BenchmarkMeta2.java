@@ -35,10 +35,6 @@ public class BenchmarkMeta2 {
     protected AtomicLong duration = new AtomicLong( 0 );
     protected AtomicLong value = new AtomicLong( 0 );
 
-    protected AtomicInteger cache_hits = new AtomicInteger( 0 );
-    protected AtomicInteger cache_misses = new AtomicInteger( 0 );
-    protected AtomicInteger cache_sets = new AtomicInteger( 0 );
-
     /**
      * The time the current benchmark was started.  -1 for never started.
      */
@@ -79,35 +75,8 @@ public class BenchmarkMeta2 {
         return duration.get() > 0 ? duration.get() / completed.get() : 0;
     }
 
-    public int getCacheHits() {
-        return cache_hits.get();
-    }
-
-    public int getCacheMisses() {
-        return cache_hits.get();
-    }
-
-    public int getCacheSets() {
-        return cache_sets.get();
-    }
-
     public long getValue() {
         return value.get();
-    }
-    
-    /**
-     * Compute the cache interval for this benchmark.  Since the benchmark is
-     * interval based this value will change as the interval rolls forward.
-     */
-    public double getCacheEfficiency() {
-
-        int cache_total = cache_misses.get() + cache_hits.get();
-
-        if ( cache_total == 0 )
-            return 0;
-
-        return ((double)cache_hits.get() / (double)cache_total) * (double)100;
-
     }
 
     public void reset() {
@@ -115,9 +84,6 @@ public class BenchmarkMeta2 {
         completed.set( 0 );
         duration.set( 0 );
         value.set( 0 );
-        cache_misses.set( 0 );
-        cache_hits.set( 0 );
-        cache_sets.set( 0 );
     }
 
     public String toString() {
