@@ -1,0 +1,2 @@
+- stop using ThreadLocal instead use StrongThreadLocal
+- 
