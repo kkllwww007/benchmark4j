@@ -46,8 +46,8 @@ public class BenchmarkHandler {
 
         Map map = new Hashtable();
 
-        addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(), "1min." );
-        addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(), "5min." );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker1().getLast(),  "1min." );
+        addHashtableMetrics( map, benchmark, benchmark.getTracker5().getLast(),  "5min." );
         addHashtableMetrics( map, benchmark, benchmark.getTracker15().getLast(), "15min." );
         
         return map;

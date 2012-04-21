@@ -117,19 +117,12 @@ public class BenchmarkMeta {
 
     public String toString() {
 
-        return 
-            "started:" +
-            getStarted() +
-            "," +
-            "completed:" +
-            getCompleted() +
-            "," +
-            "duration:" +
-            getDuration() +
-            "," +
-            "meanDuration:" +
-            getMeanDuration() 
-            ;
+        return String.format( "timestamp: %s, started:%s, completed:%s, duration:%s, meanDuration:%s", 
+                              getTimestamp(),
+                              getStarted() +
+                              getCompleted() +
+                              getDuration() +
+                              getMeanDuration() );
 
     }
 
@@ -139,7 +132,8 @@ public class BenchmarkMeta {
     public Map toMap() {
 
         Map<String,Long> map = new HashMap();
-
+        
+        map.put( "timestamp",     getTimestamp() );
         map.put( "duration",      getDuration() );
         map.put( "meanDuration",  getMeanDuration() );
         map.put( "completed",     getCompleted() );

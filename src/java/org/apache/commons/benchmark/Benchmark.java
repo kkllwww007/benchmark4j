@@ -122,9 +122,9 @@ public class Benchmark {
      */
     String name = null;
 
-    //FIXME: we need a tracker for the ENTIRE lifecycle of a VM.  this shouldn't
+    //TODO: we need a tracker for the ENTIRE lifecycle of a VM.  this shouldn't
     //take up much more memory and won't ever be rolled over.  This will come in
-    //handy for stats like the number of times a queue is reloaded 
+    //handy for stats like the number of times a queue is reloaded
     
     /**
      * The current benchmark.
